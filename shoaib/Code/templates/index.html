@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .camera-feed {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .camera-feed img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .status {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .status h2 {
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .status p {
+            font-size: 18px;
+            font-weight: bold;
+            color: #555;
+            text-align: center;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        li {
+            width: 100%;
+            background: #f0f0f0;
+            border-radius: 5px;
+            padding: 12px;
+            margin: 5px 0;
+            font-size: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .available {
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        .occupied {
+            background: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        .charge-info {
+            font-size: 14px;
+            color: #555;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .charge-info span {
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .status {
+                width: 90%;
+            }
+
+            li {
+                width: 100%;
+            }
+        }
+    </style>
+    <script>
+        function updateStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("total_slots").innerText = data.total_slots;
+                    document.getElementById("occupied_slots").innerText = data.occupied_slots;
+                    document.getElementById("available_slots").innerText = data.available_slots;
+
+                    for (let i = 0; i < data.slot_details.length; i++) {
+                        let slot = document.getElementById(`slot_${i+1}`);
+                        let time = document.getElementById(`time_${i+1}`);
+                        let charge = document.getElementById(`charge_${i+1}`);
+
+                        let isOccupied = data.slot_details[i].occupied;
+                        slot.innerText = isOccupied ? "Occupied" : "Available";
+                        slot.className = isOccupied ? "occupied" : "available";
+
+                        time.innerText = isOccupied ? data.slot_details[i].parked_time_hours + " hrs" : "-";
+                        charge.innerText = isOccupied ? "₹" + data.slot_details[i].charge : "-";
+                    }
+                });
+        }
+
+        setInterval(updateStatus, 2000);
+    </script>
+</head>
+<body>
+    <h1>Smart Parking System</h1>
+
+    <div class="container">
+        <div class="camera-feed">
+            <img src="{{ url_for('video_feed') }}" alt="Camera Feed">
+        </div>
+        <div class="status">
+            <h2>Parking Slot Status</h2>
+            <p>Total Slots: <span id="total_slots">6</span></p>
+            <p>Occupied Slots: <span id="occupied_slots">0</span></p>
+            <p>Available Slots: <span id="available_slots">6</span></p>
+            <ul>
+                <li>
+                    <span>Slot 1:</span>
+                    <span id="slot_1" class="available">Available</span>
+                    <div class="charge-info">
+                        ⏳ Time: <span id="time_1">-</span> | 💰 Charge: <span id="charge_1">-</span>
+                        <br>
+                        <button style="background-color: rgb(68, 112, 245); border-radius: 5px; padding: 5px;"><a style="color: white; text-decoration: none; " href="https://media.licdn.com/dms/image/v2/D5622AQG1oLhpR8EI7g/feedshare-shrink_1280/B56ZYkpCKeGsAk-/0/1744371459634?e=1747267200&v=beta&t=QB6w3p3Az-SPDXsS1kFxpWZwmKNdq3z7Wez-jTBl8vA" target="_blank">Pay Now</a></button>
+                    </div>
+                </li>
+                <li>
+                    <span>Slot 2:</span>
+                    <span id="slot_2" class="available">Available</span>
+                    <div class="charge-info">
+                        ⏳ Time: <span id="time_2">-</span> | 💰 Charge: <span id="charge_2">-</span>
+                        <br>
+                        <button style="background-color: rgb(68, 112, 245); border-radius: 5px; padding: 5px;"><a style="color: white; text-decoration: none; " href="https://media.licdn.com/dms/image/v2/D5622AQG1oLhpR8EI7g/feedshare-shrink_1280/B56ZYkpCKeGsAk-/0/1744371459634?e=1747267200&v=beta&t=QB6w3p3Az-SPDXsS1kFxpWZwmKNdq3z7Wez-jTBl8vA" target="_blank">Pay Now</a></button>
+                    </div>
+
+                </li>
+                <li>
+                    <span>Slot 3:</span>
+                    <span id="slot_3" class="available">Available</span>
+                    <div class="charge-info">
+                        ⏳ Time: <span id="time_3">-</span> | 💰 Charge: <span id="charge_3">-</span>
+                        <br>
+                        <button style="background-color: rgb(68, 112, 245); border-radius: 5px; padding: 5px;"><a style="color: white; text-decoration: none; " href="https://media.licdn.com/dms/image/v2/D5622AQG1oLhpR8EI7g/feedshare-shrink_1280/B56ZYkpCKeGsAk-/0/1744371459634?e=1747267200&v=beta&t=QB6w3p3Az-SPDXsS1kFxpWZwmKNdq3z7Wez-jTBl8vA" target="_blank">Pay Now</a></button>
+                    </div>
+                </li>
+                <li>
+                    <span>Slot 4:</span>
+                    <span id="slot_4" class="available">Available</span>
+                    <div class="charge-info">
+                        ⏳ Time: <span id="time_4">-</span> | 💰 Charge: <span id="charge_4">-</span>
+                        <br>
+                        <button style="background-color: rgb(68, 112, 245); border-radius: 5px; padding: 5px;"><a style="color: white; text-decoration: none; " href="https://media.licdn.com/dms/image/v2/D5622AQG1oLhpR8EI7g/feedshare-shrink_1280/B56ZYkpCKeGsAk-/0/1744371459634?e=1747267200&v=beta&t=QB6w3p3Az-SPDXsS1kFxpWZwmKNdq3z7Wez-jTBl8vA" target="_blank">Pay Now</a></button>
+                    </div>
+                </li>
+                <li>
+                    <span>Slot 5:</span>
+                    <span id="slot_5" class="available">Available</span>
+                    <div class="charge-info">
+                        ⏳ Time: <span id="time_5">-</span> | 💰 Charge: <span id="charge_5">-</span>
+                        <br>
+                        <button style="background-color: rgb(68, 112, 245); border-radius: 5px; padding: 5px;"><a style="color: white; text-decoration: none; " href="https://media.licdn.com/dms/image/v2/D5622AQG1oLhpR8EI7g/feedshare-shrink_1280/B56ZYkpCKeGsAk-/0/1744371459634?e=1747267200&v=beta&t=QB6w3p3Az-SPDXsS1kFxpWZwmKNdq3z7Wez-jTBl8vA" target="_blank">Pay Now</a></button>
+                    </div>
+                </li>
+                <li>
+                    <span>Slot 6:</span>
+                    <span id="slot_6" class="available">Available</span>
+                    <div class="charge-info">
+                        ⏳ Time: <span id="time_6">-</span> | 💰 Charge: <span id="charge_6">-</span>
+                        <br>
+                        <button style="background-color: rgb(68, 112, 245); border-radius: 5px; padding: 5px;"><a style="color: white; text-decoration: none; " href="https://media.licdn.com/dms/image/v2/D5622AQG1oLhpR8EI7g/feedshare-shrink_1280/B56ZYkpCKeGsAk-/0/1744371459634?e=1747267200&v=beta&t=QB6w3p3Az-SPDXsS1kFxpWZwmKNdq3z7Wez-jTBl8vA" target="_blank">Pay Now</a></button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+/* Parking Slot Info */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    font-size: 18px;
+    padding: 12px;
+    border-radius: 5px;
+    margin: 5px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Available and Occupied Colors */
+.available {
+    background: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.occupied {
+    background: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+/* Parking Time and Charges */
+.charge-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.charge-info span {
+    font-weight: bold;
+    color: #000;
+}
+
+.container .status {
+    background-color: black;
+}
